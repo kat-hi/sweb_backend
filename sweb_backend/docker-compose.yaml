@@ -1,0 +1,14 @@
+version: '3.3'
+
+services:
+  db:
+    image: mysql:5.7
+    healthcheck:
+      test: "exit 0"
+    restart: always
+    volumes:
+      - ./dump.sq:/docker-entrypoint-initdb.d/mysql_init.sql
+    env_file:
+      - .env
+    ports:
+      - "3306:3306"

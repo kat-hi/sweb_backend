@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sweb-frontend
+  namespace: sachs
+spec:
+  replicas: 1 
+  template:
+    metadata:
+      labels:
+        app: sweb-frontend
+    spec:
+      containers:
+        - name: sweb-frontend
+          image: registry.datexis.com/kbrendel/sweb-frontend:v3
+          ports:
+            - name: client-port
+              containerPort: 3000
+      restartPolicy: Always
+      priorityClassName: important
+      imagePullSecrets:
+        - name:  private-registry-auth
+  selector:
+    matchLabels:
+      app: sweb-frontend
+   

@@ -1,0 +1,26 @@
+version: '3.3'
+
+services:
+  db: 
+    image: mysql:5.7
+    healthcheck:
+      test: "exit 0"
+    restart: always
+    volumes:
+      - ./mysql_init.sql:/docker-entrypoint-initdb.d/mysql_init.sql
+    env_file: 
+      - .env
+    ports:
+      - 3306
+    
+  app:
+    links:
+      - db
+    build: 
+      context: sweb_backend
+      dockerfile: ../Dockerfile
+    env_file: 
+      - .env
+    ports:
+      - "5000:5000"
+    restart: always

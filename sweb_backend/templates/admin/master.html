@@ -1,0 +1,13 @@
+{% extends admin_base_template %}
+{% block styles %}
+    <!-- Bootstrap CSS -->
+    {{ bootstrap.load_css() }}
+{% endblock %}
+{% block head_css %}
+    {{ super() }}
+    <style>
+        body {
+            background-color: #f5f5f5;
+        }
+    </style>
+{% endblock %}

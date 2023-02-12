@@ -1,0 +1,249 @@
+- hosts: all
+  become: yes
+  environment:
+    MYSQL_HOME: "{{ mysql_home }}"
+    MYSQL_HISTFILE: "{{ mysql_hist_home}}"
+
+  tasks:
+    - name: Install software
+      apt:
+        update_cache: true
+        name:
+          - python3-pip
+          - mysql-server
+          - nginx
+          - python3-dev
+          - build-essential
+          - uwsgi
+          - g++
+          - make
+          - wget
+          - libssl-dev  # certbot
+          - libffi-dev # certbot
+          - python3-setuptools
+          - libaugeas0 # certbot
+          - openssl # certbot
+          - ca-certificates # certbot
+          - gcc  # certbot
+          - certbot
+          - python3-certbot-nginx
+        state: present
+
+    - name: Pip system installs
+      pip:
+        name:
+          - pymysql
+        state: present
+
+    - name: install pyopenssl for certbot
+      pip:
+        name: pyopenssl  # we need at least 23.0.0
+        extra_args: --upgrade
+
+     # DATENBANK
+    - name: Copy mysql config
+      ansible.builtin.copy:
+        src: ./mysql/.my.cnf
+        dest: /etc/mysql/conf.d/
+        owner: devops
+        group: devops
+        mode: '0600'
+
+    - name: Start mysql service
+      shell: "service mysql start"
+
+    - name: Ensure mysql is enabled to run on startup
+      service:
+        name: mysql
+        enabled: true
+        state: started
+
+    - name: Create user devops
+      mysql_user:
+        user: "{{ db_user }}"
+        password: "{{ db_pass }}"
+        login_user: root
+        login_password: "{{ mysql_root_password }}"
+        priv: "*.*:ALL,GRANT"
+        state: present
+
+    - name: Create Database
+      mysql_db:
+        name: "{{ mysql_database }}"
+        login_user: "{{ db_user }}"
+        login_password: "{{ db_pass }}"
+        state: present
+      notify: import data
+
+    - name: Copy data dump
+      copy:
+        src: "./mysql/dump.sql"
+        dest: "/tmp/dump.sql"
+
+    # Backend
+    - name: Create app directory
+      file:
+        path: /app/{{ backend_name }}/
+        state: directory
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_group }}"
+        mode:
+          0775
+
+    - name: Get Sweb-Backend from Github
+      ansible.builtin.git:
+        repo: "https://github.com/kat-hi/SWEB-backend.git" # repository must be public
+        dest: "/app/{{ backend_name }}"
+        version: master
+        update: yes
+
+    - name: Copy backend config
+      ansible.builtin.copy:
+        src: "./configs/backend_config.json"
+        dest: "/app/{{ backend_name }}/config.json"
+
+    - name: Change git config
+      git_config:
+        name: safe.directory
+        scope: global
+        value: "/app/{{ backend_name }}"
+
+    - name: Copy Python requirements (copy)
+      ansible.builtin.copy:
+        src: "../../requirements.txt"
+        dest: "/app/requirements.txt"
+
+    - name: Install Python requirements
+      pip:
+        requirements: "/app/requirements.txt"
+
+    - name: Copy systemd config file for uwsgi
+      ansible.builtin.copy:
+        src: ./uwsgi/uwsgi.service
+        dest: /etc/systemd/system/uwsgi.service
+      notify: Restart uwsgi
+
+    - name: Copy config file for uwsgi emperor
+      ansible.builtin.copy:
+        src: ./uwsgi/emperor.ini
+        dest: /etc/systemd/system/emperor.uwsgi.service
+      notify: Restart uwsgi
+
+    - name: Copy config file for sweb uwsgi web application
+      ansible.builtin.copy:
+        src: ./uwsgi/app.ini
+        dest: /etc/uwsgi/vassals/
+      notify: Restart uwsgi
+
+    - name: Allow web application to work with files
+      file:
+        path: /app/
+        state: directory
+        recurse: yes
+        group: www-data
+        mode: g+rws
+      notify: Restart uwsgi
+
+   # frontend
+    - name: Install the gpg key for nodejs LTS
+      apt_key:
+        url: "https://deb.nodesource.com/gpgkey/nodesource.gpg.key"
+        state: present
+
+    - name: Install the nodejs LTS repos
+      apt_repository:
+        repo: "deb https://deb.nodesource.com/node_{{ nodejs_version }}.x {{ ansible_distribution_release }} main"
+        state: present
+        update_cache: yes
+
+    - name: Install the nodejs
+      apt:
+        name: nodejs
+        state: present
+
+    - name: Clone Sweb-Frontend from Github
+      ansible.builtin.git:
+        repo: "https://github.com/wkrl/Stark-Wie-Ein-Baum" # repository must be public
+        dest: /app/{{ frontend_name }}
+        version: master
+        update: yes
+      register: FrontendRepository
+
+    - name: change git config
+      git_config:
+        name: safe.directory
+        scope: global
+        value: "/app/{{ frontend_name }}"
+
+    - name: Install react node.js globally.
+      npm:
+        name: create-react-app
+        global: yes
+
+    - name: Copy frontend config
+      ansible.builtin.copy:
+        src: ./configs/frontend_config.js
+        dest: /app/sweb_frontend/app/src/.env.js
+
+    - name: Install project
+      ansible.builtin.command:
+        cmd: npm install --legacy-peer-deps
+      args:
+        chdir: /app/sweb_frontend/app
+      when: FrontendRepository.changed
+
+    - name: Build frontend
+      ansible.builtin.command:
+        cmd: npm run build
+      args:
+        chdir: /app/sweb_frontend/app
+      when: FrontendRepository.changed
+
+    - name: Copy nginx configuration file
+      ansible.builtin.copy:
+        src: ./nginx/nginx.conf
+        dest: /etc/nginx/sites-available/
+      notify: Restart nginx
+
+    - name: Remove default config for nginx
+      file:
+        path: /etc/nginx/sites-enabled/default
+        state: absent
+      notify: Restart nginx
+
+    - name: Enable sweb site in nginx
+      file:
+        src: /etc/nginx/sites-available/nginx.conf
+        dest: /etc/nginx/sites-enabled/nginx
+        state: link
+      notify: Restart nginx
+
+    - name: Create cron to renew SSL Certificates
+      ansible.builtin.cron:
+        name: "Certbot renew"
+        minute: "0"
+        hour: "01"
+        job: "/usr/bin/certbot renew --quiet"
+
+    - name: Ensure /etc/letsencrypt/cli.ini contains "deploy-hook"
+      lineinfile:
+        name: /etc/letsencrypt/cli.ini
+        line: "deploy-hook = systemctl restart nginx"
+        state: present
+
+  handlers:
+    - name: Restart uwsgi
+      service:
+        name: uwsgi
+        state: restarted
+
+    - name: Restart nginx
+      service:
+        name: nginx
+        state: restarted
+
+    - name: import data
+      mysql_db:
+        name: swebDB
+        target: "/tmp/dump.sql"
+        state: import

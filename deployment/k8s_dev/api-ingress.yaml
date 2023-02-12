@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: sweb-dev-ingress
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "*"
+    kubernetes.io/ingress.class: nginx
+spec:
+  tls:
+  - secretName: "sweb-dev-demo-tls"
+    hosts:
+    - "swebapi.dev.demo.datexis.com"
+  rules:
+  - host: "swebapi.dev.demo.datexis.com"
+    http:
+      paths:
+      - path: 
+        backend:
+          serviceName: swebapi-dev-service
+          servicePort: 5000
+

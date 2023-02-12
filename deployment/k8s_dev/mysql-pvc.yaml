@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: sweb-pv-claim-dev
+  labels:
+    app: sweb-pv-claim-dev
+    tier: database
+spec:
+  accessModes:
+    - ReadOnlyMany
+  resources:
+    requests:
+      storage: 32Gi

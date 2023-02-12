@@ -1,0 +1,118 @@
+<html lang="de">
+<body>
+<div class="container">
+    <img src="/static/logo.png" alt="Logo">
+    <div class="content">
+        <h2>Stark wie ein Baum</h2>
+        <hr style="margin-top: 2rem">
+        <h3>Unauthorized.</h3>
+        <p> The server could not verify that you are authorized to access the URL requested. You either supplied the
+            wrong credentials (e.g. a bad password), or your browser doesn't understand how to supply the credentials
+            required </p>
+    </div>
+</div>
+</body>
+</html>
+
+<style>
+    html, body {
+        background-color: #a5d6a7;
+        height: 100%;
+        width: 100%;
+        margin: 0;
+        text-align: center;
+        font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+    }
+
+    body {
+        display: flex;
+        background-image: url("/static/background.jpg");
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: cover;
+    }
+
+    .container {
+        margin: auto;
+    }
+
+    .content {
+        display: block;
+        background-color: white;
+        margin: 1.2em;
+        padding: .6em 4em 1.6em 4em;
+        border-radius: 4px;
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    }
+
+    h2, h3 {
+        font-weight: 400;
+        margin: 0;
+    }
+
+    h2 {
+        margin: .6em 0 .2em 0;
+    }
+
+    h3 {
+        margin: 0 0 1.2em 0;
+        color: #424242;
+    }
+
+    .button {
+        display: inline-block;
+        color: white;
+        background-color: #EC6C3F;
+        text-decoration: none;
+        padding: .6em;
+        border-radius: 4px;
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    }
+
+    .button:hover {
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.40);
+    }
+
+    .link {
+        color: #424242;
+        font-size: .8em;
+        text-decoration: none;
+        display: block;
+        margin: .4em 0 0 0;
+    }
+
+    .link:hover {
+        text-decoration: underline;
+    }
+
+    img {
+        width: 6em;
+        height: auto;
+        animation: jump 1.4s infinite;
+        animation-delay: .4s;
+    }
+
+    @keyframes jump {
+        0% {
+            transform: scale(1, 1) translateY(0);
+        }
+        10% {
+            transform: scale(1.1, .9) translateY(0);
+        }
+        30% {
+            transform: scale(.9, 1.1) translateY(-100px);
+        }
+        50% {
+            transform: scale(1, 1) translateY(0);
+        }
+        57% {
+            transform: scale(1, 1) translateY(-7px);
+        }
+        64% {
+            transform: scale(1, 1) translateY(0);
+        }
+        100% {
+            transform: scale(1, 1) translateY(0);
+        }
+    }

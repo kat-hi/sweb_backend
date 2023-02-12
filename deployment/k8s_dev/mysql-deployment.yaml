@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sweb-backend-mysql-dev
+  labels:
+    app: sweb-backend-mysql-dev
+    tier: database
+spec:
+  replicas: 1 
+  template:
+    metadata:
+      labels:
+        app: sweb-backend-mysql-dev
+        tier: database
+    spec:
+      containers:
+        - name: sweb-backend-mysql-dev
+          image: mysql:5.7
+          ports:
+            - name: client-port
+              containerPort: 3306
+          envFrom:
+            - configMapRef:
+                name: swebapi-dev-config
+          volumeMounts:
+            - name: sweb-pv-claim
+              mountPath: /var/lib/mysql 
+              subPath: mysql
+          resources:
+            requests:
+              cpu: "4"
+              memory: "16Gi"
+            limits:
+              cpu: "8"
+              memory: "32Gi"
+      imagePullSecrets:
+        - name: private-registry-auth
+      volumes:
+        - name: sweb-pv-claim
+          persistentVolumeClaim:
+            claimName: sweb-pv-claim-dev
+  selector:
+    matchLabels:
+      app: sweb-backend-mysql-dev
+      tier: database

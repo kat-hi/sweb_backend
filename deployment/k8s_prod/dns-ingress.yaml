@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: dns-api-ingress
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "*"
+    kubernetes.io/ingress.class: nginx
+spec:
+  tls:
+  - secretName: "dns-ingress-tls"
+    hosts:
+    - "admin.stark-wie-ein-baum.de"
+  rules:
+  - host: "admin.stark-wie-ein-baum.de"
+    http:
+      paths:
+      - path:
+        backend:
+          serviceName: swebapi-service
+          servicePort: 5000

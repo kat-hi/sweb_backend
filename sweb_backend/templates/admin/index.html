@@ -1,0 +1,80 @@
+{% extends  'admin/master.html' %}
+
+{% block head_css %}
+    {{ super() }}
+    <style>
+        html, body {
+            background-color: #a5d6a7;
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            text-align: center;
+            font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+        }
+
+        body {
+            display: flex;
+            background-image: url("/static/background.jpg");
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: cover;
+        }
+
+        .content {
+            display: block;
+            margin: 3em;
+            padding: .6em 4em 1.6em 4em;
+            border-radius: 4px;
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            background-color: white;
+            opacity: 0.8;
+        }
+
+        h2, h3 {
+            font-weight: 400;
+            margin: 0;
+        }
+
+        h2 {
+            margin: .6em 0 .2em 0;
+        }
+
+        h3 {
+            margin: 0 0 1.2em 0;
+            color: #424242;
+        }
+
+        .button {
+            display: inline-block;
+            color: white;
+            background-color: #EC6C3F;
+            text-decoration: none;
+            padding: .6em;
+            border-radius: 4px;
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+        }
+
+        .button:hover {
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.40);
+        }
+
+        img {
+            width: 6em;
+            height: auto;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <html lang="de">
+    <body>
+    <img src="/static/logo.png" alt="Logo">
+    <div class="content">
+        <h2>Stark wie ein Baum</h2>
+        <h3>Admin Backend</h3>
+        <a class="button" href="https://admin.stark-wie-ein-baum.de/app/admin/logout">Logout</a>
+    </div>
+    </body>
+    </html>
+{% endblock %}

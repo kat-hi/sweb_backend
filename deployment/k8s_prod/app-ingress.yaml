@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: sweb-ingress
+  namespace: sachs
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/allow-origin: "swebapi.demo.datexis.com"
+spec:
+  tls:
+  - secretName: "sweb-app-ingress.demo-tls"
+    hosts:
+    - "app.stark-wie-ein-baum.de"
+  rules:
+  - host: "app.stark-wie-ein-baum.de"
+    http: 
+      paths:
+      - path: 
+        backend:
+          serviceName: sweb-frontend-service
+          servicePort: 3000
+
