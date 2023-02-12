@@ -92,9 +92,9 @@
 
     - name: Get Sweb-Backend from Github
       ansible.builtin.git:
-        repo: "https://github.com/kat-hi/SWEB-backend.git" # repository must be public
+        repo: "https://github.com/kat-hi/sweb_backend.git" # repository must be public
         dest: "/app/{{ backend_name }}"
-        version: master
+        version: main
         update: yes
 
     - name: Copy backend config

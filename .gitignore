@@ -33,3 +33,4 @@ log/
 configs/
 frontend_env.js
 config.json
+.my.cnf
