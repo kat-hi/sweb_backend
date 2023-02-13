@@ -81,8 +81,8 @@ class User(UserMixin):
 		from sweb_backend import DB
 		DB.session.execute(
 			"INSERT INTO admins (id, email) "
-			"VALUES (?, ?)",
-			(id_, email),
+			"VALUES (:id, :email)",
+			{'id': id_, 'email': email},
 		)
 		DB.commit()
 

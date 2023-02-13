@@ -10,15 +10,6 @@ admin_login = Blueprint('admin_login', __name__)
 CURRENT_EMAIL = str()
 
 
-# @login_manager.user_loader
-# def load_user(user_id):
-# 	app.logger.info('LOAD USER, SHOW EMAIL: ' + str(user_id))
-# 	app.logger.info('LOAD USER, SHOW EMAIL: ' + str(CURRENT_EMAIL))
-# 	from sweb_backend import models, DB
-# 	user = DB.session.query(models.Admins).filter(models.Admins.email == CURRENT_EMAIL).first()
-# 	app.logger.info(user)
-# 	return user
-
 @login_manager.user_loader
 def load_user(user_id):
 	from sweb_backend.models import User
@@ -36,7 +27,7 @@ def _get_google_provider_cfg():
 # user_id is the user_id from the cookies that is created when a user logs in.
 def flask_user_authentication(users_email, unique_id):
 	from sweb_backend.models import User
-	app.logger.info('flask_user_authentication')
+	app.logger.info(f'flask_user_authentication: {unique_id}')
 
 	allowed_emails = [app.config.get("LOGIN", {}).get("ADMIN_EMAIL_1"),
 					  app.config.get("LOGIN", {}).get("ADMIN_EMAIL_2")]
@@ -152,7 +143,6 @@ def callback():
 def logout():
 	# from sweb_backend import DB
 	app.logger.info("admin home route /app/admin/logout")
-	app.logger.info('logout')
 	app.logger.info(f'current_user: {current_user}')
 	logout_user()
 	admin_base_url = app.config.get("ADMIN_BASE_URL")
