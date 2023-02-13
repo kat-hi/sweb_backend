@@ -68,7 +68,6 @@ class User(UserMixin):
 			logging.info("--- No user found in get()")
 			return None
 
-		logging.info(user)
 		logging.info(f"return user {user}")
 		return user
 
