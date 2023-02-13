@@ -13,6 +13,7 @@ CURRENT_EMAIL = str()
 @login_manager.user_loader
 def load_user(user_id):
 	from sweb_backend.models import User
+	app.logger.info(f"USER LOADER: {user_id}")
 	return User.get(user_id)
 
 
@@ -35,12 +36,14 @@ def flask_user_authentication(users_email, unique_id):
 	if users_email in allowed_emails:
 		user = User.get(users_email)
 		if not user:
-			User.create(unique_id[:2], users_email)
-		else:
-			app.logger.info(user)
-			global CURRENT_EMAIL
-			CURRENT_EMAIL = users_email
-			login_user(user, remember=True, force=True)
+			app.logger.info("NOT USER")
+			User.create(unique_id[:8], users_email)
+			user = User.get(unique_id[:8])
+
+		app.logger.info(user)
+		global CURRENT_EMAIL
+		CURRENT_EMAIL = users_email
+		login_user(user, remember=True, force=True)
 		return True
 	else:
 		app.logger.info('FLASK USER AUTHENTICATION FAILED')
