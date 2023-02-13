@@ -30,12 +30,12 @@ def flask_user_authentication(users_email, unique_id):
 	from sweb_backend.models import User
 	app.logger.info(f'flask_user_authentication: {unique_id}')
 
-	allowed_emails = [app.config.get("LOGIN", {}).get("ADMIN_EMAIL_1"),
-					  app.config.get("LOGIN", {}).get("ADMIN_EMAIL_2")]
+	# allowed_emails = [app.config.get("LOGIN", {}).get("ADMIN_EMAIL_1"),
+	# 				  app.config.get("LOGIN", {}).get("ADMIN_EMAIL_2")]
 
-	if users_email in allowed_emails:
-		user = User.query.filter_by(email=users_email).first()
-
+	# if users_email in allowed_emails:
+	user = User.query.filter_by(email=users_email).first()
+	if user:
 		app.logger.info(user)
 		global CURRENT_EMAIL
 		CURRENT_EMAIL = users_email
