@@ -31,13 +31,11 @@ def get_valid_image_uri(image_output):
 			regex = 'lnk/[\w]*'
 			image_id = re.search(regex, image['uri']).group().split('lnk/')[1]
 			image_uri = f'{base_download_url}{image_id}'
-			app.logger.info(f"check: {image_id}")
 			response = requests.head(image_uri)
 
 			app.logger.info(f"RESPONSE: {response}")
 			if response.status_code is 200 and (
 				response.headers['Content-Type'] == 'image/png' or response.headers['Content-Type'] == 'image/jpeg'):
-				app.logger.info('response' + str(response))
 				checked_files.append(base_download_url + image_id)
 			else:
 				app.logger.info(f'image not available: {image}')
