@@ -35,16 +35,12 @@ def flask_user_authentication(users_email, unique_id):
 	if users_email in allowed_emails:
 		user = User.get(users_email)
 		if not user:
-			User.create(unique_id, users_email)
-
-		global CURRENT_EMAIL
-		CURRENT_EMAIL = users_email
-		user.authenticated = True
-		user.active = True
-		from sweb_backend import DB
-		DB.session.add(user)
-		DB.session.commit(user)
-		login_user(user, remember=True, force=True)
+			User.create(unique_id[:2], users_email)
+		else:
+			app.logger.info(user)
+			global CURRENT_EMAIL
+			CURRENT_EMAIL = users_email
+			login_user(user, remember=True, force=True)
 		return True
 	else:
 		app.logger.info('FLASK USER AUTHENTICATION FAILED')
