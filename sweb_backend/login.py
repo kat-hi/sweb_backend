@@ -39,6 +39,11 @@ def flask_user_authentication(users_email, unique_id):
 
 		global CURRENT_EMAIL
 		CURRENT_EMAIL = users_email
+		user.authenticated = True
+		user.active = True
+		from sweb_backend import DB
+		DB.session.add(user)
+		DB.session.commit(user)
 		login_user(user, remember=True, force=True)
 		return True
 	else:
