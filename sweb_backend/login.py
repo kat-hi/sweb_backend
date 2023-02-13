@@ -14,7 +14,8 @@ CURRENT_EMAIL = str()
 def load_user(user_id):
 	from sweb_backend.models import User
 	app.logger.info(f"USER LOADER: {user_id}")
-	return User.get(user_id)
+	user = User.get(user_id)
+	return User(user.id, u.email)
 
 
 # TODO HttpError handling
@@ -30,11 +31,12 @@ def flask_user_authentication(users_email, unique_id):
 	from sweb_backend.models import User
 	app.logger.info(f'flask_user_authentication: {unique_id}')
 
-	user = User.get(user_email=users_email)
+	user = User.get_by_email(user_email=users_email)
 	if user:
 		app.logger.info(user)
 		global CURRENT_EMAIL
 		CURRENT_EMAIL = users_email
+		user = User(user.id, user.email)
 		login_user(user, remember=True, force=True)
 		return True
 	else:

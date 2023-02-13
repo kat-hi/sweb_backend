@@ -58,11 +58,25 @@ class User(UserMixin):
 		self.email = email
 
 	@staticmethod
-	def get(user_email):
-		logging.info("Get User")
+	def get_by_email(user_email):
+		logging.info("Get User by email")
 
 		from sweb_backend import DB
 		user = DB.session.execute('SELECT * FROM admins WHERE email = :val', {'val': user_email}).fetchone()
+
+		if not user:
+			logging.info("--- No user found in get()")
+			return None
+
+		logging.info(f"return user {user}")
+		return user
+
+	@staticmethod
+	def get(id):
+		logging.info("Get User by ID")
+
+		from sweb_backend import DB
+		user = DB.session.execute('SELECT * FROM admins WHERE id = :val', {'val': id}).fetchone()
 
 		if not user:
 			logging.info("--- No user found in get()")
