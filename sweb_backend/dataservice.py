@@ -31,6 +31,7 @@ def get_valid_image_uri(image_output):
 		try:
 			regex = 'lnk/[\w]*'
 			image_id = re.search(regex, image['uri']).group().split('lnk/')[1]
+			app.logger.info(f'image id: {image_id}')
 			response = requests.head(base_download_url + image_id)
 			app.logger.info(f"RESPONSE: {response}")
 			if response.status_code is 200 and (

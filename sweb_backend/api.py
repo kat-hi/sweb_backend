@@ -52,6 +52,8 @@ def get_imagelinks():
 	current_app.logger.info(f"request imagelinks")
 	image_output = dbservice.get_json_data(models.Image, schemas.Image, id=None)
 	checked_files = dataservice.get_valid_image_uri(image_output)
+	app.logger.info("CHECKED FILES")
+	app.logger.info(checked_files)
 	return jsonify({'data': checked_files}), 200
 
 
