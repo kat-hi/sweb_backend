@@ -49,7 +49,7 @@ def get_coordinates_of_tree(id):
 @api.route('/karte/baeume/properties', methods=['GET'])
 def get_imagelinks():
 	from flask import current_app
-	current_app.logger.info(f"request /karte/baeume/properties")
+	current_app.logger.info(f"request imagelinks")
 	image_output = dbservice.get_json_data(models.Image, schemas.Image, id=None)
 	checked_files = dataservice.get_valid_image_uri(image_output)
 	return jsonify({'data': checked_files}), 200
