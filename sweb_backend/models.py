@@ -62,7 +62,7 @@ class User(UserMixin):
 		logging.info("Get User")
 
 		from sweb_backend import DB
-		user = DB.execute('SELECT * FROM admins WHERE email = :val', {'val': user_email}).fetchone()
+		user = DB.session.execute('SELECT * FROM admins WHERE email = :val', {'val': user_email}).fetchone()
 
 		if not user:
 			logging.info("--- No user found in get()")
