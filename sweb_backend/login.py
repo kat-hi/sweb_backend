@@ -15,7 +15,7 @@ def load_user(user_id):
 	from sweb_backend.models import User
 	app.logger.info(f"USER LOADER: {user_id}")
 	user = User.get(user_id)
-	return User(user.id, u.email)
+	return User(user.id, user.email)
 
 
 # TODO HttpError handling
