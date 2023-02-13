@@ -33,12 +33,12 @@ def flask_user_authentication(users_email, unique_id):
 					  app.config.get("LOGIN", {}).get("ADMIN_EMAIL_2")]
 
 	if users_email in allowed_emails:
-		if not User.get(unique_id):
+		user = User.get(users_email)
+		if not user:
 			User.create(unique_id, users_email)
 
 		global CURRENT_EMAIL
 		CURRENT_EMAIL = users_email
-		user = User(id_=unique_id, email=users_email)
 		login_user(user, remember=True, force=True)
 		return True
 	else:
