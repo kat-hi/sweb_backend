@@ -34,11 +34,7 @@ def flask_user_authentication(users_email, unique_id):
 					  app.config.get("LOGIN", {}).get("ADMIN_EMAIL_2")]
 
 	if users_email in allowed_emails:
-		user = User.get(users_email)
-		if not user:
-			app.logger.info("NOT USER")
-			User.create(unique_id[:8], users_email)
-			user = User.get(unique_id[:8])
+		user = User.query.filter_by(email=users_email).first()
 
 		app.logger.info(user)
 		global CURRENT_EMAIL
