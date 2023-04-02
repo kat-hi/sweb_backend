@@ -264,6 +264,26 @@
           user: root
           cron_file: "mysql_dump"
 
+      - name: Create backup script
+        copy:
+          dest: /tmp/mysql_backup.sh
+          mode: '0700'
+          content: |
+            #!/bin/bash
+            backup_file=/tmp/dump.sql
+            mysql_user={{ db_user }}
+            mysql_password={{ db_pass }}
+            mysql_database={{ mysql_database }}
+            mysqldump -u $mysql_user -p $mysql_password $mysql_database > $backup_file
+
+      - name: Create cron job
+        cron:
+          name: "MySQL backup"
+          minute: 0
+          hour: 14
+          weekday: 0
+          job: "/tmp/mysql_backup.sh"
+
   handlers:
     - name: Restart uwsgi
       service:

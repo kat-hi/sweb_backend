@@ -10,19 +10,12 @@ admin_login = Blueprint('admin_login', __name__)
 CURRENT_EMAIL = str()
 
 
-# @login_manager.user_loader
-# def load_user(user_id):
-# 	app.logger.info('LOAD USER, SHOW EMAIL: ' + str(user_id))
-# 	app.logger.info('LOAD USER, SHOW EMAIL: ' + str(CURRENT_EMAIL))
-# 	from sweb_backend import models, DB
-# 	user = DB.session.query(models.Admins).filter(models.Admins.email == CURRENT_EMAIL).first()
-# 	app.logger.info(user)
-# 	return user
-
 @login_manager.user_loader
 def load_user(user_id):
 	from sweb_backend.models import User
-	return User.get(user_id)
+	app.logger.info(f"USER LOADER: {user_id}")
+	user = User.get(user_id)
+	return User(user.id, user.email)
 
 
 # TODO HttpError handling
@@ -36,18 +29,14 @@ def _get_google_provider_cfg():
 # user_id is the user_id from the cookies that is created when a user logs in.
 def flask_user_authentication(users_email, unique_id):
 	from sweb_backend.models import User
-	app.logger.info('flask_user_authentication')
+	app.logger.info(f'flask_user_authentication: {unique_id}')
 
-	allowed_emails = [app.config.get("LOGIN", {}).get("ADMIN_EMAIL_1"),
-					  app.config.get("LOGIN", {}).get("ADMIN_EMAIL_2")]
-
-	if users_email in allowed_emails:
-		if not User.get(unique_id):
-			User.create(unique_id, users_email)
-
+	user = User.get_by_email(user_email=users_email)
+	if user:
+		app.logger.info(user)
 		global CURRENT_EMAIL
 		CURRENT_EMAIL = users_email
-		user = User(id_=unique_id, email=users_email)
+		user = User(user.id, user.email)
 		login_user(user, remember=True, force=True)
 		return True
 	else:
@@ -152,7 +141,6 @@ def callback():
 def logout():
 	# from sweb_backend import DB
 	app.logger.info("admin home route /app/admin/logout")
-	app.logger.info('logout')
 	app.logger.info(f'current_user: {current_user}')
 	logout_user()
 	admin_base_url = app.config.get("ADMIN_BASE_URL")
