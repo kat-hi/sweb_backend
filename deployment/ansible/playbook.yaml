@@ -27,6 +27,7 @@
           - gcc  # certbot
           - certbot
           - python3-certbot-nginx
+          - apache2-utils
         state: present
 
     - name: Pip system installs
@@ -40,7 +41,12 @@
         name: pyopenssl  # we need at least 23.0.0
         extra_args: --upgrade
 
-     # DATENBANK
+    - name: Copy .htpasswd
+      copy:
+        src: "./configs/.htpasswd"
+        dest: "/etc/apache2/.htpasswd"
+
+    # DATENBANK
     - name: Copy mysql config
       ansible.builtin.copy:
         src: ./mysql/.my.cnf
@@ -135,6 +141,23 @@
         dest: /etc/uwsgi/vassals/
       notify: Restart uwsgi
 
+    - name: Create backup directory
+      file:
+        path: /app/backup/
+        state: directory
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_group }}"
+        mode:
+          0775
+
+    - name: Create symbolic link for mysql dump download
+      ansible.builtin.file:
+        src: /tmp/dump.sql
+        dest: /app/backup/dump.sql
+        owner: devops
+        group: www-data
+        state: link
+
     - name: Allow web application to work with files
       file:
         path: /app/
@@ -144,7 +167,8 @@
         mode: g+rws
       notify: Restart uwsgi
 
-   # frontend
+
+    # frontend
     - name: Install the gpg key for nodejs LTS
       apt_key:
         url: "https://deb.nodesource.com/gpgkey/nodesource.gpg.key"
@@ -230,6 +254,26 @@
         name: /etc/letsencrypt/cli.ini
         line: "deploy-hook = systemctl restart nginx"
         state: present
+
+    - name: Create backup script
+      copy:
+        dest: /tmp/mysql_backup.sh
+        mode: '0700'
+        content: |
+          #!/bin/bash
+          backup_file=/tmp/dump.sql
+          mysql_user={{ db_user }}
+          mysql_password={{ db_pass }}
+          mysql_database={{ mysql_database }}
+          mysqldump -u $mysql_user -p $mysql_password $mysql_database > $backup_file
+
+    - name: Create cron job
+      cron:
+        name: "MySQL backup"
+        minute: 0
+        hour: 14
+        weekday: 0
+        job: "/tmp/mysql_backup.sh"
 
   handlers:
     - name: Restart uwsgi
