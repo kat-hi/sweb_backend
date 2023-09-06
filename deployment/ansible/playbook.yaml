@@ -45,6 +45,7 @@
         copy:
           src: "./configs/.htpasswd"
           dest: "/etc/apache2/.htpasswd"
+          force: false
 
       # DATENBANK
       - name: Copy mysql config
@@ -54,6 +55,7 @@
           owner: devops
           group: devops
           mode: '0600'
+          force: false
 
       - name: Start mysql service
         shell: "service mysql start"
@@ -150,14 +152,6 @@
           mode:
             0775
 
-      - name: Create symbolic link for mysql dump download
-        ansible.builtin.file:
-          src: /tmp/dump.sql
-          dest: /app/backup/dump.sql
-          owner: devops
-          group: www-data
-          state: link
-
       - name: Allow web application to work with files
         file:
           path: /app/
@@ -166,7 +160,6 @@
           group: www-data
           mode: g+rws
         notify: Restart uwsgi
-
 
       # frontend
       - name: Install the gpg key for nodejs LTS
@@ -246,28 +239,14 @@
         ansible.builtin.cron:
           name: "Certbot renew"
           minute: "0"
-          hour: "01"
+          hour: "0"
+          weekday: "1"
           job: "/usr/bin/certbot renew --quiet"
-
-      - name: Ensure /etc/letsencrypt/cli.ini contains "deploy-hook"
-        lineinfile:
-          name: /etc/letsencrypt/cli.ini
-          line: "deploy-hook = systemctl restart nginx"
-          state: present
-
-      - name: Add cronjob for MySQL dump
-        cron:
-          name: "MySQL dump"
-          minute: "0"
-          hour: "20"
-          job: "/usr/bin/mysqldump -u root -p{{ db_pass }} {{ mysql_database }} >  /tmp/dump.sql 2>&1"
-          user: root
-          cron_file: "mysql_dump"
 
       - name: Create backup script
         copy:
           dest: /tmp/mysql_backup.sh
-          mode: '0700'
+          mode: '0770'
           content: |
             #!/bin/bash
             backup_file=/tmp/dump.sql
@@ -279,9 +258,7 @@
       - name: Create cron job
         cron:
           name: "MySQL backup"
-          minute: 0
-          hour: 14
-          weekday: 0
+          minute: "*/2"
           job: "/tmp/mysql_backup.sh"
 
   handlers:
