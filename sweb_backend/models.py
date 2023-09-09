@@ -1,6 +1,7 @@
 import logging
 
 from flask_login import UserMixin
+
 import sweb_backend
 
 
@@ -36,9 +37,14 @@ class Sorts(sweb_backend.DB.Model):
 	beschreibung = sweb_backend.DB.Column(sweb_backend.DB.String)
 	reifezeit = sweb_backend.DB.Column(sweb_backend.DB.String)
 	geschmack = sweb_backend.DB.Column(sweb_backend.DB.String)
+	geschmackID = sweb_backend.DB.Column(sweb_backend.DB.Integer)
 	verwendung = sweb_backend.DB.Column(sweb_backend.DB.String)
 	lager = sweb_backend.DB.Column(sweb_backend.DB.String)
 	verbreitung = sweb_backend.DB.Column(sweb_backend.DB.String)
+	lagerfaehigkeit = sweb_backend.DB.Column(sweb_backend.DB.Integer)
+	tafelobst = sweb_backend.DB.Column(sweb_backend.DB.Boolean)
+	essen = sweb_backend.DB.Column(sweb_backend.DB.Boolean)
+	trinken = sweb_backend.DB.Column(sweb_backend.DB.Boolean)
 
 
 # class Admins(sweb_backend.DB.Model, UserMixin):
