@@ -4,15 +4,46 @@ from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
 class Tree(SQLAlchemyAutoSchema):
     class Meta:
         fields = (
-            "BaumNr", "BaumID", "Pflanzreihe", "PflanzreihePosition", "SortenID", "Sorte", "Frucht", "PatenID",
+            "BaumNr",
+            "BaumID",
+            "Pflanzreihe",
+            "PflanzreihePosition",
+            "SortenID",
+            "Sorte",
+            "Frucht",
+            "PatenID",
             "Longitude",
-            "Latitude")
+            "Latitude",
+        )
 
 
 class Sorts(SQLAlchemyAutoSchema):
     class Meta:
-        fields = ("id", "frucht", "sorte", "andereNamen", "herkunft", "groesse", "beschreibung", "reifezeit",
-                  "geschmack", "verwendung", "lager", "verbreitung")
+        fields = (
+            "id",
+
+            "frucht",
+            "sorte",
+            "andereNamen",
+            "herkunft",
+            "groesse",
+            "beschreibung",
+
+            "reifezeit",
+            "lager",
+            "lagerfaehigkeit",
+
+            "geschmack",
+            "geschmackID",
+
+            "verbreitung",
+            "verwendung",
+
+            # Boolean fruit usage fields
+            "tafelobst",
+            "essen",
+            "trinken",
+        )
 
 
 class Treecoordinates(SQLAlchemyAutoSchema):

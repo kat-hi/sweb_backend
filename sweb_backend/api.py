@@ -34,21 +34,18 @@ def get_tree(id):
 
 @api.route('/karte/baeume/koordinaten', methods=['GET'])
 def get_coordinates():
-	from flask import current_app
 	app.logger.info("request /karte/baeume/koordinaten")
 	return dbservice.get_json_data(models.Plantlist, schemas.Treecoordinates, id=None)
 
 
 @api.route('/karte/baeume/<id>/koordinaten', methods=['GET'])
 def get_coordinates_of_tree(id):
-	from flask import current_app
 	app.logger.info(f"request /karte/baeume/{id}/koordinaten")
 	return dbservice.get_json_data(models.Plantlist, schemas.Treecoordinates, id=id)
 
 
 @api.route('/karte/baeume/properties', methods=['GET'])
 def get_imagelinks():
-	from flask import current_app
 	app.logger.info(f"request imagelinks")
 	image_output = dbservice.get_json_data(models.Image, schemas.Image, id=None)
 	checked_files = dataservice.get_valid_image_uri(image_output)
